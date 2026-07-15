@@ -11,19 +11,12 @@ def gradlewCommand = { List<String> args ->
 }
 
 ext.javaHomeCandidates = [
-    '8': [
-        '/usr/lib/jvm/java-8-openjdk-amd64',
-        '/usr/lib/jvm/java-1.8.0-openjdk-amd64',
-        '/mnt/c/Program Files/Java/jre1.8.0_361',
-        '/mnt/c/Program Files/Java/jre1.8.0_321',
-        '/mnt/c/Program Files/Java/jdk1.8.0_361'
-    ],
-    '17': [
-        '/usr/lib/jvm/java-17-openjdk-amd64',
-        '/usr/lib/jvm/java-1.17.0-openjdk-amd64',
-        '/usr/lib/jvm/openjdk-17',
-        '/mnt/c/Program Files/Eclipse Adoptium/jdk-17.0.5.8-hotspot',
-        '/mnt/c/Program Files/Java/jdk-17'
+    '21': [
+        '/usr/lib/jvm/java-21-openjdk-amd64',
+        '/usr/lib/jvm/java-1.21.0-openjdk-amd64',
+        '/usr/lib/jvm/openjdk-21',
+        '/mnt/c/Program Files/Eclipse Adoptium/jdk-21',
+        '/mnt/c/Program Files/Java/jdk-21'
     ]
 ]
 
@@ -51,9 +44,7 @@ def resolveJavaHome(String version) {
 }
 
 def forgeTargets = [
-    [id: '1.16.5', dir: 'forge-1.16.5', javaVersion: '8'],
-    [id: '1.18.2', dir: 'forge-1.18.2', javaVersion: '17'],
-    [id: '1.20.1', dir: 'forge-1.20.1', javaVersion: '17']
+    [id: 'NeoForge1.21.1', dir: 'neoforge-1.21.1', javaVersion: '21']
 ]
 
 forgeTargets.each { target ->
@@ -62,7 +53,7 @@ forgeTargets.each { target ->
 
     tasks.register(taskName, Exec) {
         group = 'build'
-        description = "构建 Forge ${target.id} 版本"
+        description = "构建 ${target.id} 版本"
         workingDir = file(target.dir)
         if (javaHome) {
             environment 'JAVA_HOME', javaHome
@@ -73,6 +64,6 @@ forgeTargets.each { target ->
 
 tasks.register('buildAllTargets') {
     group = 'build'
-    description = '依次构建所有 Forge 目标'
+    description = '构建当前维护的 NeoForge 目标'
     dependsOn forgeTargets.collect { "buildForge${it.id.replaceAll('[^A-Za-z0-9]', '')}" }
 }

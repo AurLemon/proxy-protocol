@@ -1,0 +1,29 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "All Rights Reserved"
+issueTrackerURL = "https://github.com/PanSzelescik/proxy-protocol-support/issues"
+
+[[mods]]
+modId = "proxy_protocol"
+version = "${version}"
+displayName = "proxy-protocol"
+displayURL = "https://www.curseforge.com/minecraft/mc-mods/proxy-protocol-support"
+authors = "PanSzelescik"
+description = '''
+proxy-protocol support for NeoForge servers
+'''
+mixins = ["${mixinConfig}"]
+
+[[dependencies.proxy_protocol]]
+modId = "minecraft"
+type = "required"
+versionRange = "[${minecraftVersion},1.22)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.proxy_protocol]]
+modId = "neoforge"
+type = "required"
+versionRange = "[${neoForgeVersion},)"
+ordering = "NONE"
+side = "BOTH"

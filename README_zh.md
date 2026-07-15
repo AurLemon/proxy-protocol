@@ -4,7 +4,7 @@
 
 本项目基于 [PanSzelescik/proxy-protocol-support](https://github.com/PanSzelescik/proxy-protocol-support)。
 
-**proxy-protocol** 是一个 **Forge 模组**，用于在 Minecraft 服务器部署在 **HAProxy / TCPShield / Nginx** 等 TCP 反向代理之后，仍然保留并获取客户端的**真实 IP 地址**。该模组会解析 **Proxy Protocol** 数据包，并将其中的内容暴露给插件使用，使下游代码能够读取客户端原始的 `SocketAddress`，而不是代理服务器的地址。
+**proxy-protocol** 现在以 **Minecraft 1.21.1 的 NeoForge 模组** 为主线维护，用于在服务器部署在 **HAProxy / TCPShield / Nginx** 等 TCP 反向代理之后，仍然保留并获取客户端的**真实 IP 地址**。该模组会解析 **Proxy Protocol** 数据包，并将其中的内容暴露给插件使用，使下游代码能够读取客户端原始的 `SocketAddress`，而不是代理服务器的地址。
 
 例如，你可以使用 **[TCPShield](https://tcpshield.com/)** 或其他软件（如 **[Nginx](https://nginx.org/en/docs/stream/ngx_stream_proxy_module.html#proxy_protocol)**）来转发网络流量，从而隐藏服务器的真实 IP 地址。
 在未启用 Proxy Protocol 的情况下，服务器控制台和插件中只能看到**代理服务器的 IP**；而通过解析并读取 Proxy Protocol 数据包，则可以正确获取并显示玩家的真实 IP 地址。
@@ -13,15 +13,15 @@
 
 ## 架构布局
 
-- 根目录：`build.gradle`/`settings.gradle`/`gradlew`/`gradle.properties` 负责协调三个版本、统一 Proxy 配置，并通过 `proxy-properties.gradle` 填充上下游模块。
-- `forge-1.16.5/`：Forge 1.16.5 子工程（ForgeGradle 4.x、Java 8），含旧版本的 mixin/handler。
-- `forge-1.18.2/`：Forge 1.18.2 子工程（ForgeGradle 5.x、Java 17），提供 1.18.2 映射与兼容代码。
-- `forge-1.20.1/`：Forge 1.20.1 子工程（ForgeGradle 6.x、Java 17），构建最新的 jar/shadow 产物。
+- 根目录：`build.gradle`/`settings.gradle`/`gradlew`/`gradle.properties` 只负责当前维护的 NeoForge 1.21.1 构建，并通过 `proxy-properties.gradle` 统一代理配置。
+- `neoforge-1.21.1/`：当前维护主线（JDK 21），产出最新的 jar/shadow 产物。
+- `forge-1.16.5/`、`forge-1.18.2/`、`forge-1.20.1/`：仅作为历史参考保留，**不再维护**；同时它们**不能使用 JDK 21**，其中 `1.16.5` 需要 JDK 8，`1.18.2`/`1.20.1` 需要 JDK 17。
 
 ## 构建方式
 
-- 根目录的 `./gradlew buildAllTargets` 可用于一次性生成所有版本；它会根据版本选择 Java 8/17，也可以通过设置 `JAVA_HOME_8`/`JAVA_HOME_17` 来覆盖。
-- 如果只想单独构建某个版本：进入 `forge-1.xx` 目录执行 `./gradlew build`，每个子工程会自动加载父级 `proxy-properties.gradle`，复用统一的代理设置。
+- 根目录的 `./gradlew buildAllTargets` 现在只构建当前维护的 `neoforge-1.21.1`，默认选择 JDK 21，也可以通过 `JAVA_HOME_21`、`JAVA_HOME_1_21` 或 `JAVA_HOME` 覆盖。
+- 如果只想单独构建当前维护版本：进入 `neoforge-1.21.1` 目录执行 `./gradlew build`。
+- 旧 Forge 目录已明确移出根聚合构建，原因是它们不再维护，且仍然依赖 JDK 8/JDK 17。
 - 代理配置集中在根目录的 `gradle.properties`；CI 和子模块启动前都会设置这些 `systemProp.*`，无需在每个子工程重复写，运行时配置会保存为 `proxy-protocol.json`。
 
 ## 配置文件
@@ -48,4 +48,4 @@
 }
 ```
 
-- GitHub Actions 仅按版本逐个运行构建，每个 job 上传 `proxy-protocol-<version>` 产物。
+- 运行时配置契约保持不变：旧 Forge 版本可用的 `proxy-protocol.json` 可以 **1:1 原样复用** 到 NeoForge 1.21.1。

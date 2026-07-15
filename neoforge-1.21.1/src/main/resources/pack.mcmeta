@@ -1,0 +1,6 @@
+{
+  "pack": {
+    "description": "proxy-protocol for Minecraft ${minecraftVersion}",
+    "pack_format": 34
+  }
+}
