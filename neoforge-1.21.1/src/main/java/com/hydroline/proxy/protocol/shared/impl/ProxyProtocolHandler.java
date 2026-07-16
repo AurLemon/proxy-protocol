@@ -1,13 +1,13 @@
 package com.hydroline.proxy.protocol.shared.impl;
 
 import com.hydroline.proxy.protocol.shared.ProxyProtocolSupport;
-import com.hydroline.proxy.protocol.shared.mixin.ProxyProtocolAddressSetter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.haproxy.HAProxyCommand;
 import io.netty.handler.codec.haproxy.HAProxyMessage;
 import net.minecraft.network.Connection;
 
+import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
@@ -15,6 +15,8 @@ import java.net.SocketAddress;
  * Reads HAProxyMessage to set valid Player IP
  */
 public class ProxyProtocolHandler extends ChannelInboundHandlerAdapter {
+    private static final String[] ADDRESS_FIELD_CANDIDATES = {"address", "o", "f_129469_"};
+    private static volatile Field connectionAddressField;
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -76,8 +78,43 @@ public class ProxyProtocolHandler extends ChannelInboundHandlerAdapter {
             validateWhitelist(ctx, connection);
         }
 
-        ((ProxyProtocolAddressSetter) connection).setAddress(targetAddress);
+        setConnectionAddress(connection, targetAddress);
         ProxyProtocolSupport.logDebug("Assigned proxy client address " + targetAddress + " (original proxy: " + connection.getRemoteAddress() + ").");
+    }
+
+    private void setConnectionAddress(Connection connection, SocketAddress targetAddress) {
+        try {
+            resolveConnectionAddressField().set(connection, targetAddress);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Unable to assign Connection.address via reflection.", e);
+        }
+    }
+
+    private static Field resolveConnectionAddressField() throws NoSuchFieldException {
+        Field field = connectionAddressField;
+        if (field != null) {
+            return field;
+        }
+
+        synchronized (ProxyProtocolHandler.class) {
+            field = connectionAddressField;
+            if (field != null) {
+                return field;
+            }
+
+            for (String candidate : ADDRESS_FIELD_CANDIDATES) {
+                try {
+                    field = Connection.class.getDeclaredField(candidate);
+                    field.setAccessible(true);
+                    connectionAddressField = field;
+                    ProxyProtocolSupport.logDebug("Resolved Connection address field via reflection: " + candidate);
+                    return field;
+                } catch (NoSuchFieldException ignored) {
+                }
+            }
+        }
+
+        throw new NoSuchFieldException("No compatible Connection address field found.");
     }
 
     private void validateWhitelist(ChannelHandlerContext ctx, Connection connection) {
