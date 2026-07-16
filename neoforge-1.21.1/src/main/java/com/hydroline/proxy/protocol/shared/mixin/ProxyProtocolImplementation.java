@@ -19,7 +19,7 @@ import com.hydroline.proxy.protocol.shared.impl.ProxyProtocolFallbackInitializer
 @Mixin(ServerConnectionListener.class)
 public class ProxyProtocolImplementation {
 
-    @Redirect(method = "m_9711_(Ljava/net/InetAddress;I)V", at = @At(value = "INVOKE", target = "Lio/netty/bootstrap/ServerBootstrap;childHandler(Lio/netty/channel/ChannelHandler;)Lio/netty/bootstrap/ServerBootstrap;", remap = false), remap = false)
+    @Redirect(method = "startTcpServerListener", at = @At(value = "INVOKE", target = "Lio/netty/bootstrap/ServerBootstrap;childHandler(Lio/netty/channel/ChannelHandler;)Lio/netty/bootstrap/ServerBootstrap;", remap = false))
     private ServerBootstrap addProxyProtocolSupport(ServerBootstrap bootstrap, ChannelHandler childHandler) {
         IChannelInitializer channelInitializer;
         if (childHandler instanceof IChannelInitializer) {

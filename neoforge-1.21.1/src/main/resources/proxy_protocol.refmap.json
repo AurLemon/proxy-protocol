@@ -1,0 +1,20 @@
+{
+  "mappings": {
+    "com/hydroline/proxy/protocol/shared/mixin/ProxyProtocolAddressSetter": {
+      "address": "o:Ljava/net/SocketAddress;"
+    },
+    "com/hydroline/proxy/protocol/shared/mixin/ProxyProtocolImplementation": {
+      "startTcpServerListener": "Lnet/minecraft/server/network/ServerConnectionListener;a(Ljava/net/InetAddress;I)V"
+    }
+  },
+  "data": {
+    "searge": {
+      "com/hydroline/proxy/protocol/shared/mixin/ProxyProtocolAddressSetter": {
+        "address": "o:Ljava/net/SocketAddress;"
+      },
+      "com/hydroline/proxy/protocol/shared/mixin/ProxyProtocolImplementation": {
+        "startTcpServerListener": "Lnet/minecraft/server/network/ServerConnectionListener;a(Ljava/net/InetAddress;I)V"
+      }
+    }
+  }
+}

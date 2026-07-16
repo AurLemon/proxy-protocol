@@ -15,6 +15,6 @@ import java.net.SocketAddress;
 @Mixin(Connection.class)
 public interface ProxyProtocolAddressSetter {
 
-    @Accessor(value = "f_129469_", remap = false)
+    @Accessor
     void setAddress(SocketAddress address);
 }

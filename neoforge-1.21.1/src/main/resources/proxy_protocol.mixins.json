@@ -8,6 +8,7 @@
     "ProxyProtocolAddressSetter",
     "ProxyProtocolImplementation"
   ],
+  "refmap": "proxy_protocol.refmap.json",
   "injectors": {
     "defaultRequire": 1
   }

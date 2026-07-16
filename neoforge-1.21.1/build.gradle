@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'net.neoforged.moddev' version '2.0.141'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'com.gradleup.shadow' version '8.3.0'
     id 'maven-publish'
 }
 
@@ -84,9 +84,6 @@ dependencies {
     nettyCodecHaproxy('io.netty:netty-codec-haproxy:4.1.91.Final') {
         transitive = false
     }
-    additionalRuntimeClasspath('io.netty:netty-codec-haproxy:4.1.91.Final') {
-        transitive = false
-    }
 }
 
 tasks.named('processResources', ProcessResources).configure {
@@ -111,6 +108,7 @@ shadowJar {
     configurations = [project.configurations.nettyCodecHaproxy]
     archiveClassifier.set('shadow')
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    relocate('io.netty.handler.codec.haproxy', 'com.hydroline.proxy.protocol.shaded.io.netty.handler.codec.haproxy')
     exclude('module-info.class')
     exclude('META-INF/versions/**/module-info.class')
     mergeServiceFiles()
